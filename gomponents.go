@@ -81,6 +81,8 @@ func El(name string, children ...Node) Node {
 
 func render(w2 io.Writer, name *string, children ...Node) error {
 	w := &statefulWriter{w: w2}
+	children = flattenGroups(children)
+	children = concatAttrs(children)
 
 	if name != nil {
 		w.Write([]byte("<" + *name))
@@ -112,7 +114,6 @@ func renderChild(w *statefulWriter, c Node, t NodeType) {
 	if w.err != nil || c == nil {
 		return
 	}
-
 	// Rendering groups like this is still important even though a group can render itself,
 	// since otherwise attributes will sometimes be ignored.
 	if g, ok := c.(Group); ok {
